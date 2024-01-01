@@ -6,7 +6,7 @@
 
 
 - A beefed up version of cranview from. Visit [`{my link}`](https://alphaprime7.shinyapps.io/cranQuery/) to use the app conveniently. This is my first published shiny app.
-- Any suggestions are welcomed.
+- The next task will be implementing smoothing of the time series especially for the daily view.
 - Visit [`{dgrtwo}`](https://github.com/dgrtwo/cranview/tree/master) for the source of the inspiration for this project.
 - This project is a good part of the R curriculum for newbies and as it was for myself. I showcase the use of several tools as I extend knowledge from my API intro repository [`{api_intro repository}`](https://github.com/AlphaPrime7/api_intro).
 - This project is perfect recipe for trusting the process.
