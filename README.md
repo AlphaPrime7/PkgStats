@@ -1,8 +1,8 @@
-## CranQuery
-
-<a href="https://www.cran-e.com/author/Tingwei%20Adeck">
+## CranQuery <a href="https://www.cran-e.com/author/Tingwei%20Adeck">
 <img src="https://img.shields.io/badge/CRAN-Tingwei Adeck-blue?style=flat-square&amp;logo=CRAN&amp;logoColor=white"/>
 </a>
+
+
 
 - A beefed up version of cranview from. Visit [`{my link}`](https://alphaprime7.shinyapps.io/cranQuery/) to use the app conveniently. This is my first published shiny app.
 - Any suggestions are welcomed.
