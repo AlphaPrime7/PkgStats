@@ -84,19 +84,41 @@ shinyServer(function(input, output) {
       packages <- input$pkgs
       ird = get_initial_release_date(packages)
       
-      if(is.vector(input$date_range) || input$time_range == 0 || input$year_range == 0){
+      if(input$theme == 'light'){
         
-        plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() +
-          xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
-          scale_x_date( limits =  input$date_range )
+        if(is.vector(input$date_range) || input$time_range == 0 || input$year_range == 0){
+          
+          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() +
+            xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
+            scale_x_date( limits =  input$date_range )
+          
+        } else if (!is.vector(input$date_range) || input$time_range != 0 || input$year_range != 0){
+          
+          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() +
+            xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
+            scale_x_date( limits = c( (lubridate::today() - (input$time_range * 7 * input$year_range)),lubridate::today() ) )
+          
+        }
         
-      } else if (!is.vector(input$date_range) || input$time_range != 0 || input$year_range != 0){
+      } else {
         
-        plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() +
-          xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
-          scale_x_date( limits = c( (lubridate::today() - (input$time_range * 7 * input$year_range)),lubridate::today() ) )
+        if(is.vector(input$date_range) || input$time_range == 0 || input$year_range == 0){
+          
+          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() + dark_mode() +
+            xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
+            scale_x_date( limits =  input$date_range )
+          
+        } else if (!is.vector(input$date_range) || input$time_range != 0 || input$year_range != 0){
+          
+          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() + dark_mode() +
+            xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
+            scale_x_date( limits = c( (lubridate::today() - (input$time_range * 7 * input$year_range)),lubridate::today() ) )
+          
+        }
         
       }
+      
+  
       
       })
     
