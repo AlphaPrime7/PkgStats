@@ -11,7 +11,7 @@ package_names = names(jsonlite::fromJSON(rawToChar(package_names$content)))
 cran_inception = 26
 
 #shiny ui
-shinyUI(navbarPage(theme = "mytheme.css",
+shinyUI(navbarPage(theme = hinytheme("slate"),
     "R Package Stats Hub",
     tabPanel("R PKG STATS",
                             
