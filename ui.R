@@ -47,12 +47,15 @@ shinyUI(
             
             radioButtons('theme', 'Plot Theme:', c('Dark' = 'dark', 'Light' = 'light') ),
             
-            actionButton("plot_button","Plot Stats")
+            actionButton("plot_button","Plot Stats"),
+            
+            checkboxInput('smoothen', 'Smoothen the Lines', value = FALSE)
                                     
     ),
                                 
         mainPanel(
             plotlyOutput("interactive_ggplot"),
+            downloadButton("download_plot", "Download Plot"),
             DT::dataTableOutput("mytable")
             ))),
     

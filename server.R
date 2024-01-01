@@ -5,6 +5,8 @@ library(tidyverse)
 library(zoo)
 library(aweek)
 library(ggplot2)
+library(ggthemes)
+library(ggdark)
 library(scales)
 library(plotly)
 library(lubridate)
@@ -42,7 +44,7 @@ shinyServer(function(input, output) {
         #selectizeInput(inputId = "init_rel_date", label = "Initial release date", 
                        #as.Date(get_initial_release_date(packages) ), multiple = F) })
     
-    packages <- reactive({c(input$pkgs)})
+    #packages <- reactive({c(input$pkgs)})
     
     plot_container <- reactiveValues()
     
@@ -51,7 +53,57 @@ shinyServer(function(input, output) {
       
       d <- downloads()
       
-      if (input$plot_freq == "week") {
+      if(isTRUE(input$smoothen)){
+        
+        d = d %>%
+          group_by(package) %>%
+          dplyr::mutate(count = zoo::rollmean(count, k = 3, fill='extend'))
+        
+        if (input$plot_freq == "week") {
+          
+          d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
+          date = as.data.frame(unique(d$week_raw))
+          
+          d = d %>% 
+            group_by(year = year(date), week = week(date), package) %>% 
+            summarise_if(is.numeric, sum)
+          
+          d = cbind(d, as.numeric(1))
+          names(d)[ncol(d)] <- "control"
+          
+          suppressMessages ({
+            date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
+            d = cbind(d,date)
+            names(d)[ncol(d)] <- "date"
+            
+          })
+          
+          
+          d = janitor::clean_names(d) #some QC
+          
+          d = d %>%
+            group_by(package) %>%
+            dplyr::mutate(count = zoo::rollmean(count, k = 3, fill='extend'))
+          
+        } else if (input$plot_freq == "tw"){
+          
+          d$count= zoo::rollapply(d$count, 7, sum, fill=NA)
+          
+        } else if (input$plot_freq == "ytd") {
+          
+          d = d %>%
+            group_by(package) %>%
+            transmute(count=cumsum(count), date=date) 
+          
+          d = d %>%
+            group_by(package) %>%
+            dplyr::mutate(count = zoo::rollmean(count, k = 3, fill='extend'))
+          
+        }
+        
+      } else {
+        
+        if (input$plot_freq == "week") {
         
         d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
         date = as.data.frame(unique(d$week_raw))
@@ -63,9 +115,12 @@ shinyServer(function(input, output) {
         d = cbind(d, as.numeric(1))
         names(d)[ncol(d)] <- "control"
         
-        date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
-        d = cbind(d,date)
-        names(d)[ncol(d)] <- "date"
+        suppressMessages({
+          date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
+          d = cbind(d,date)
+          names(d)[ncol(d)] <- "date"
+        })
+       
         
         d = janitor::clean_names(d) #some QC
         
@@ -77,24 +132,26 @@ shinyServer(function(input, output) {
         
         d = d %>%
           group_by(package) %>%
-          transmute(count=cumsum(count), date=date) 
-
+          transmute(count=cumsum(count), date=date)
+        
+        }
       }
       
-      packages <- input$pkgs
-      ird = get_initial_release_date(packages)
+      
+      #packages <- input$pkgs
+      #ird = get_initial_release_date(packages)
       
       if(input$theme == 'light'){
         
         if(is.vector(input$date_range) || input$time_range == 0 || input$year_range == 0){
           
-          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() +
+          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() + 
             xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
             scale_x_date( limits =  input$date_range )
           
         } else if (!is.vector(input$date_range) || input$time_range != 0 || input$year_range != 0){
           
-          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() +
+          plot_container$plot = ggplot(d, aes(date, count, color = package)) + geom_line() + 
             xlab("Date") + scale_y_continuous(name="Number of downloads", labels = comma) + 
             scale_x_date( limits = c( (lubridate::today() - (input$time_range * 7 * input$year_range)),lubridate::today() ) )
           
@@ -118,14 +175,19 @@ shinyServer(function(input, output) {
         
       }
       
-  
-      
       })
     
     output$interactive_ggplot <- renderPlotly({
       plot_container$plot
     
     })
+    
+    output$download_plot <- downloadHandler(
+      filename <- function() {
+        paste0("Pkgs_plots", ".png", sep = "")},
+      content <- function(file_norm){
+        ggsave(file_norm, plot=plot_container$plot)
+        })
     
     
     output$mytable <- DT::renderDataTable({
