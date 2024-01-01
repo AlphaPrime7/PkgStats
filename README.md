@@ -1,7 +1,7 @@
 ## CranQuery
 
-<a href="https://github.com/AlphaPrime7">
-<img src="https://readme-typing-svg.demolab.com?font=Georgia&amp;size=18&amp;duration=2000&amp;pause=100&amp;multiline=true&amp;width=500&amp;height=80&amp;lines=Tingwei+Adeck;R+Developer;Data Scientist" alt="Typing SVG"/>
+<a href="https://www.cran-e.com/author/Tingwei%20Adeck">
+<img src="https://img.shields.io/badge/CRAN-Tingwei Adeck-blue?style=flat-square&amp;logo=CRAN&amp;logoColor=white"/>
 </a>
 
 - A beefed up version of cranview from. Visit [`{my link}`](https://alphaprime7.shinyapps.io/cranQuery/) to use the app conveniently. This is my first published shiny app.
