@@ -2,10 +2,6 @@
 
 <a href="https://github.com/AlphaPrime7">
 <img src="https://readme-typing-svg.demolab.com?font=Georgia&amp;size=18&amp;duration=2000&amp;pause=100&amp;multiline=true&amp;width=500&amp;height=80&amp;lines=Tingwei+Adeck;R+Developer;Data Scientist" alt="Typing SVG"/>
-</a> <br/>
-
-<a href="https://alphaprime7.github.io">
-<img src="https://img.shields.io/badge/Website-alphaprime7.github.io-green?style=flat-square"/>
 </a>
 
 - A beefed up version of cranview from. Visit [`{my link}`](https://alphaprime7.shinyapps.io/cranQuery/) to use the app conveniently. This is my first published shiny app.
