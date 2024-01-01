@@ -136,7 +136,7 @@ shinyServer(function(input, output) {
       } else if (input$plot_freq == "tw"){
         
         d$count= zoo::rollapply(d$count, 7, sum, fill=NA)
-        st = aggregate(d$count, list(d$package), FUN=mean)
+        st = aggregate(d$count, list(d$package), FUN=mean, na.rm=TRUE)
         colnames(st) = c('Package','Trail_Weekly_Mean')
         
       } else if (input$plot_freq == "ytd") {
