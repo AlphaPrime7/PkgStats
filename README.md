@@ -1,4 +1,5 @@
-## CranQuery <a href="https://www.cran-e.com/author/Tingwei%20Adeck">
+## CranQuery 
+<a href="https://www.cran-e.com/author/Tingwei%20Adeck">
 <img src="https://img.shields.io/badge/CRAN-Tingwei Adeck-blue?style=flat-square&amp;logo=CRAN&amp;logoColor=white"/>
 </a>
 
