@@ -2,12 +2,12 @@ library(shiny)
 library(jsonlite)
 library(cranlogs)
 library(tidyverse)
+library(zoo)
+library(aweek)
 library(ggplot2)
+library(scales)
 library(plotly)
 library(lubridate)
-library(zoo)
-library(scales)
-
 
 #get initial release date
 get_initial_release_date = function(packages)
@@ -53,20 +53,32 @@ shinyServer(function(input, output) {
       
       if (input$plot_freq == "week") {
         
-        d$week_raw <- as.Date(lubridate::floor_date(d$date, "week"))
+        d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
         date = as.data.frame(unique(d$week_raw))
         
         d = d %>% 
-          group_by(year = year(date), week = week(date)) %>% 
+          group_by(year = year(date), week = week(date), package) %>% 
           summarise_if(is.numeric, sum)
         
-        d = cbind(date, d)
+        d = cbind(d, as.numeric(1))
+        names(d)[ncol(d)] <- "control"
+        
+        date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
+        d = cbind(d,date)
+        names(d)[ncol(d)] <- "date"
+        
+        d = janitor::clean_names(d) #some QC
+        
+      } else if (input$plot_freq == "tw"){
+        
+        d$count= zoo::rollapply(d$count, 7, sum, fill=NA)
         
       } else if (input$plot_freq == "ytd") {
         
         d = d %>%
           group_by(package) %>%
           transmute(count=cumsum(count), date=date) 
+
       }
       
       packages <- input$pkgs
@@ -93,5 +105,51 @@ shinyServer(function(input, output) {
     
     })
     
+    
+    output$mytable <- DT::renderDataTable({
+      
+      d <- downloads()
+      st = aggregate(d$count, list(d$package), FUN=mean)
+      colnames(st) = c('Package','Daily_Mean')
+      
+      if (input$plot_freq == "week") {
+        
+        d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
+        date = as.data.frame(unique(d$week_raw))
+        
+        d = d %>% 
+          group_by(year = year(date), week = week(date), package) %>% 
+          summarise_if(is.numeric, sum)
+        
+        d = cbind(d, as.numeric(1))
+        names(d)[ncol(d)] <- "control"
+        
+        date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
+        d = cbind(d,date)
+        names(d)[ncol(d)] <- "date"
+        
+        d = janitor::clean_names(d) #some QC
+        
+        st = aggregate(d$count, list(d$package), FUN=mean)
+        colnames(st) = c('Package','Weekly_Mean')
+        
+      } else if (input$plot_freq == "tw"){
+        
+        d$count= zoo::rollapply(d$count, 7, sum, fill=NA)
+        st = aggregate(d$count, list(d$package), FUN=mean)
+        colnames(st) = c('Package','Trail_Weekly_Mean')
+        
+      } else if (input$plot_freq == "ytd") {
+        
+        d = d %>%
+          group_by(package) %>%
+          transmute(count=cumsum(count), date=date) 
+        st = aggregate(d$count, list(d$package), FUN=mean)
+        colnames(st) = c('Package','Cumulative_Mean')
+        
+      }
+      
+      DT::datatable(st, options = list(scrollX = TRUE),
+                    rownames = FALSE) })
     
 })

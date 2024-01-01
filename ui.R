@@ -1,5 +1,6 @@
 #library(shiny)
 library(shinythemes)
+library(DT)
 library(plotly)
 library(Hmisc)
 library(lubridate)
@@ -41,15 +42,27 @@ shinyUI(navbarPage(theme = "mytheme.css",
                         max = round(Hmisc::yearDays(lubridate::year(Sys.Date()))/7),
                         step = 1),
                                     
-            radioButtons('plot_freq', 'Frequency:', c('Daily' = 'day', 'Weekly' = 'week', 'Cumulative' = 'ytd') ),
+            radioButtons('plot_freq', 'Frequency:', c('Daily' = 'day', 'Weekly' = 'week', 'Trailing_week' = 'tw', 'Cumulative' = 'ytd') ),
             
             actionButton("plot_button","Plot Stats")
                                     
     ),
                                 
         mainPanel(
-            plotlyOutput("interactive_ggplot")
-            )))
+            plotlyOutput("interactive_ggplot"),
+            DT::dataTableOutput("mytable")
+            ))),
+    
+    tabPanel("Help",
+             
+             HTML("Welcome to The Adeck's Package Statistics Hub", 
+                  "This is a beefed up version of the App",
+             "Inspired by the dgrtwo's stats package for more practice on using Shiny, APIs, 
+                  httr and an added component jsonlite.",
+                  "Unaffiliated with RStudio or CRAN.",
+                  "Check dgrtwo's repo at <a href='https://github.com/dgrtwo/cranview'> for the original work.</a>,")
+      
+    )
                    
     )
 )
