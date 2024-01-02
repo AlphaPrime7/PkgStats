@@ -6,8 +6,8 @@ library(Hmisc)
 library(lubridate)
 
 #Pkgs
-package_names = httr::GET("http://crandb.r-pkg.org/-/desc")
-package_names = names(jsonlite::fromJSON(rawToChar(package_names$content)))
+#package_names = httr::GET("http://crandb.r-pkg.org/-/desc")
+#package_names = names(jsonlite::fromJSON(rawToChar(package_names$content)))
 cran_inception = 26
 
 #shiny ui
@@ -20,10 +20,12 @@ shinyUI(
                                 
         sidebarPanel(
                                     
-            selectInput('pkgs', 'Packages:',
-            selected = sample(package_names, 2),
-            choices = package_names,
-            multiple = TRUE),
+            #selectInput('pkgs', 'Packages:',
+            #selected = sample(package_names, 2),
+            #choices = package_names,
+            #multiple = TRUE),
+          
+            uiOutput("pkges"),
             
             dateRangeInput("date_range", "Period you want to see:",
                            min   = Sys.Date()- (Hmisc::yearDays(lubridate::year(Sys.Date())) * cran_inception),

@@ -1,4 +1,5 @@
 library(shiny)
+reactiveConsole(TRUE)
 library(jsonlite)
 library(cranlogs)
 library(tidyverse)
@@ -31,6 +32,20 @@ get_initial_release_date = function(packages)
 
 # SHINY SERVER
 shinyServer(function(input, output) {
+  
+  package_names = reactive({
+    
+    pnames = httr::GET("http://crandb.r-pkg.org/-/desc")
+    names(jsonlite::fromJSON(rawToChar(pnames$content)))
+    
+  })
+  
+  output$pkges <- renderUI({
+    p = package_names()
+    selectizeInput(inputId = "pkgs", label = "Packages:", 
+                   p, selected = sample(p,3), multiple = T , size = 3)
+  })
+  
     
     downloads <- reactive({
         packages <- input$pkgs
@@ -40,9 +55,6 @@ shinyServer(function(input, output) {
                         to      = Sys.Date()-1)
     })
     
-    #output$cal_init <- renderUI({
-        #selectizeInput(inputId = "init_rel_date", label = "Initial release date", 
-                       #as.Date(get_initial_release_date(packages) ), multiple = F) })
     
     #packages <- reactive({c(input$pkgs)})
     
@@ -192,48 +204,53 @@ shinyServer(function(input, output) {
     
     output$mytable <- DT::renderDataTable({
       
-      d <- downloads()
-      st = aggregate(d$count, list(d$package), FUN=mean)
-      colnames(st) = c('Package','Daily_Mean')
+     suppressWarnings({
+       d <- downloads()
+       st = aggregate(d$count, list(d$package), FUN=mean)
+       colnames(st) = c('Package','Daily_Mean')
+       
+       if (input$plot_freq == "week") {
+         
+         d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
+         date = as.data.frame(unique(d$week_raw))
+         
+         d = d %>% 
+           group_by(year = year(date), week = week(date), package) %>% 
+           summarise_if(is.numeric, sum)
+         
+         d = cbind(d, as.numeric(1))
+         names(d)[ncol(d)] <- "control"
+         
+         date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
+         d = cbind(d,date)
+         names(d)[ncol(d)] <- "date"
+         
+         d = janitor::clean_names(d) #some QC
+         
+         st = aggregate(d$count, list(d$package), FUN=mean)
+         colnames(st) = c('Package','Weekly_Mean')
+         
+       } else if (input$plot_freq == "tw"){
+         
+         d$count= zoo::rollapply(d$count, 7, sum, fill=NA)
+         st = aggregate(d$count, list(d$package), FUN=mean, na.rm=TRUE)
+         colnames(st) = c('Package','Trail_Weekly_Mean')
+         
+       } else if (input$plot_freq == "ytd") {
+         
+         d = d %>%
+           group_by(package) %>%
+           transmute(count=cumsum(count), date=date) 
+         st = aggregate(d$count, list(d$package), FUN=mean)
+         colnames(st) = c('Package','Cumulative_Mean')
+         
+       }
+       
+       DT::datatable(st, options = list(scrollX = TRUE),
+                     rownames = FALSE) })
+       
+     })
       
-      if (input$plot_freq == "week") {
-        
-        d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
-        date = as.data.frame(unique(d$week_raw))
-        
-        d = d %>% 
-          group_by(year = year(date), week = week(date), package) %>% 
-          summarise_if(is.numeric, sum)
-        
-        d = cbind(d, as.numeric(1))
-        names(d)[ncol(d)] <- "control"
-        
-        date = as.data.frame(with(d, get_date(year = year, week = week, day = control)))
-        d = cbind(d,date)
-        names(d)[ncol(d)] <- "date"
-        
-        d = janitor::clean_names(d) #some QC
-        
-        st = aggregate(d$count, list(d$package), FUN=mean)
-        colnames(st) = c('Package','Weekly_Mean')
-        
-      } else if (input$plot_freq == "tw"){
-        
-        d$count= zoo::rollapply(d$count, 7, sum, fill=NA)
-        st = aggregate(d$count, list(d$package), FUN=mean, na.rm=TRUE)
-        colnames(st) = c('Package','Trail_Weekly_Mean')
-        
-      } else if (input$plot_freq == "ytd") {
-        
-        d = d %>%
-          group_by(package) %>%
-          transmute(count=cumsum(count), date=date) 
-        st = aggregate(d$count, list(d$package), FUN=mean)
-        colnames(st) = c('Package','Cumulative_Mean')
-        
-      }
       
-      DT::datatable(st, options = list(scrollX = TRUE),
-                    rownames = FALSE) })
     
 })
