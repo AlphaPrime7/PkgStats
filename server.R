@@ -74,6 +74,7 @@ shinyServer(function(input, output) {
         if (input$plot_freq == "week") {
           
           d$week_raw <- as.Date(lubridate::ceiling_date(d$date, "week"))
+          #d$week_num = strftime(d$date, format = "%V")
           date = as.data.frame(unique(d$week_raw))
           
           d = d %>% 
