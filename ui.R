@@ -20,7 +20,7 @@ tagList(
       img(src = "ajax-loader-bar.gif")),
   
   navbarPage(
-    title = tags$b("R Package Statistics Hub"),
+    title = tags$b("CRANstats"),
     windowTitle = "CRANstats",
     id = "main_nav",
     inverse = FALSE,

@@ -1,6 +1,7 @@
 downloads <- reactive({
   packages <- input$pkgs
   cran_downloads0 <- purrr::possibly(cran_downloads, otherwise = NULL, quiet = TRUE)
+  req(packages)
   cran_downloads0(package = packages, 
                   from    = get_initial_release_date(packages), 
                   to      = Sys.Date()-1)
@@ -8,7 +9,7 @@ downloads <- reactive({
 plot_container <- reactiveValues()
 
 observeEvent(input$plot_button,{
-  
+  req(downloads())
   d <- downloads()
   
   if(isTRUE(input$smoothen)){
@@ -149,6 +150,7 @@ output$download_plot <- downloadHandler(
 output$mytable <- DT::renderDataTable({
   
   suppressWarnings({
+    req(downloads())
     d <- downloads()
     st = aggregate(d$count, list(d$package), FUN=mean)
     colnames(st) = c('Package','Daily_Mean')
