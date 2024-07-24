@@ -1,6 +1,6 @@
 library(fresh)
-create_theme(
-  theme = "default",
+fresh::create_theme(
+  theme = c("cerulean"),
   bs_vars_navbar(
     default_bg = "#3f2d54",
     default_color = "#6f2d58",

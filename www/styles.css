@@ -1,0 +1,32 @@
+/*******
+.navbar {
+  background: #557b83;
+  margin-bottom: 0;
+  font-size: 20px;
+  color: #FFFFFF;
+  /*box-shadow: 0 0 10px #222; 
+}*/
+
+/*body {
+  /*background-color: #557b83;/*#778ba5,#201a16,#378ba5,#378ba7
+  }*/
+
+#loading-content {
+  position: fixed;
+  background: #000000;
+  z-index: 10000;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding-top: 50px;
+  bottom: 0;
+  font-size: 50px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.shiny-spinner-output-container, 
+.load-container { 
+  font-size: 20px; 
+}
+
