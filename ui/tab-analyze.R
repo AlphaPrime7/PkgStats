@@ -23,11 +23,11 @@ tabPanel(
       radioButtons('plot_freq', 'Frequency:', c('Daily' = 'day', 'Weekly' = 'week', 'Trailing_week' = 'tw', 'Cumulative' = 'ytd') ),
       radioButtons('theme', 'Plot Theme:', c('Dark' = 'dark', 'Light' = 'light') ),
       actionButton("plot_button","Plot Stats"),
+      downloadButton("download_plot", "Download Plot"),
       checkboxInput('smoothen', 'Smoothen the Lines', value = FALSE)
       ),
     mainPanel(
       plotlyOutput("interactive_ggplot"),
-      downloadButton("download_plot", "Download Plot"),
       withSpinner(DT::dataTableOutput("mytable"))
       
       )
