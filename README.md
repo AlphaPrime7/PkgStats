@@ -8,7 +8,7 @@
 
 ```{R}
 packrat::status() #1
-packrat::snapshot() #2
+packrat::snapshot() #2 tricky but removes my packages
 packrat::clean() #2.5
 packrat::init() #3
 packrat::bundle(bundle="PkgStats-2024-07-24.tar.gz", where="/home/alphaprime7/Documents/Done/R") #4
