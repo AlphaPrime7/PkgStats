@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyjs)
 library(shinycssloaders)
+reactiveConsole(enabled = T)
 library(jsonlite)
 library(cranlogs)
 library(tidyverse)
@@ -26,7 +27,7 @@ shinyServer(function(input, output, session) {
   })
   
   package_names = reactive({get_package_names()})
-  reactive({updateSelectizeInput(session, "pkgs",choices = package_names(), selected = sample(package_names(),3), server = TRUE)})
+  updateSelectizeInput(session, "pkgs",choices = package_names(), selected = sample(package_names(),3), server = TRUE)
   source(file.path("server", "tab-analyze.R"),  local = TRUE)$value
 })
 
