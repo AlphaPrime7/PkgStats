@@ -19,7 +19,6 @@ source(file.path("functions", "gird.R"),  local = TRUE)
 shinyServer(function(input, output, session) {
   
   Sys.sleep(3)
-  
   observe({
     removeUI(selector = "#loading-content")
     shinyjs::show("main_nav")
@@ -27,7 +26,7 @@ shinyServer(function(input, output, session) {
   })
   
   package_names = reactive({get_package_names()})
-  updateSelectizeInput(session, "pkgs",choices = package_names(), selected = sample(package_names(),3), server = TRUE)
+  reactive({updateSelectizeInput(session, "pkgs",choices = package_names(), selected = sample(package_names(),3), server = TRUE)})
   source(file.path("server", "tab-analyze.R"),  local = TRUE)$value
 })
 
